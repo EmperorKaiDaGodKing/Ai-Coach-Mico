@@ -1,8 +1,7 @@
 import openai
-import getpass
 
 # Simple prompt for a title/caption suggestion
-openai.api_key = getpass.getpass("Enter your OpenAI API Key: ")
+openai.api_key = input("Enter your OpenAI API Key: ")
 
 while True:
     prompt = input("Enter mood or content to caption: ")
