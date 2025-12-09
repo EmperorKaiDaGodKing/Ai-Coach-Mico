@@ -7,7 +7,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 try:
     from zoneinfo import ZoneInfo
-except Exception:
+except ImportError:
     from pytz import timezone as ZoneInfo  # fallback if needed
 
 ROOT = Path.cwd()
