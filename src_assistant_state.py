@@ -10,8 +10,7 @@ try:
 except ImportError:
     from pytz import timezone as ZoneInfo  # fallback if needed
 
-ROOT = Path.cwd()
-DATA_DIR = ROOT / "data"
+DATA_DIR = Path.cwd() / "data"
 MEMORY_FILE = DATA_DIR / "memory.json"
 
 DEFAULT_STATE = {
