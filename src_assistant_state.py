@@ -27,7 +27,7 @@ DEFAULT_STATE = {
 class AssistantState:
     def __init__(self, memory_path=MEMORY_FILE):
         self.memory_path = Path(memory_path)
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        self.memory_path.parent.mkdir(parents=True, exist_ok=True)
         if not self.memory_path.exists():
             self._write(DEFAULT_STATE)
         self.state = self._read()
