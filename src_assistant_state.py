@@ -15,7 +15,7 @@ MEMORY_FILE = DATA_DIR / "memory.json"
 
 DEFAULT_STATE = {
     "user_profile": {
-        "username": "EmperorKaiDaGodKing",
+        "username": "User",
         "timezone": "America/Los_Angeles",
         "preferences": { "default_mode": "concise", "daily_window": "08:00-22:00" }
     },
