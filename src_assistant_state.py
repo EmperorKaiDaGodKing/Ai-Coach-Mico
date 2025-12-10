@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 try:
     from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 except ImportError:
+    # For Python < 3.9, ensure 'pytz' is installed (add 'pytz; python_version < "3.9"' to requirements.txt)
     from pytz import timezone as ZoneInfo  # fallback if needed
     from pytz.exceptions import UnknownTimeZoneError as ZoneInfoNotFoundError
 
@@ -30,7 +31,7 @@ DEFAULT_STATE = {
 class AssistantState:
     def __init__(self, memory_path=MEMORY_FILE):
         self.memory_path = Path(memory_path)
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        self.memory_path.parent.mkdir(parents=True, exist_ok=True)
         if not self.memory_path.exists():
             self._write(DEFAULT_STATE)
         self.state = self._read()
