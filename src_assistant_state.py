@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 try:
     from zoneinfo import ZoneInfo
 except ImportError:
+    # For Python < 3.9, ensure 'pytz' is installed (add 'pytz; python_version < "3.9"' to requirements.txt)
     from pytz import timezone as ZoneInfo  # fallback if needed
 
 DATA_DIR = Path.cwd() / "data"
