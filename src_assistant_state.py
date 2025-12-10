@@ -16,6 +16,9 @@ except ImportError:
     except (ImportError, AttributeError):
         # Older pytz versions may not have UnknownTimeZoneError
         ZoneInfoNotFoundError = KeyError
+    # For Python < 3.9, ensure 'pytz' is installed (add 'pytz; python_version < "3.9"' to requirements.txt)
+    from pytz import timezone as ZoneInfo  # fallback if needed
+    from pytz.exceptions import UnknownTimeZoneError as ZoneInfoNotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +38,7 @@ DEFAULT_STATE = {
 class AssistantState:
     def __init__(self, memory_path=MEMORY_FILE):
         self.memory_path = Path(memory_path)
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        self.memory_path.parent.mkdir(parents=True, exist_ok=True)
         if not self.memory_path.exists():
             self._write(DEFAULT_STATE)
         self.state = self._read()
@@ -63,6 +66,8 @@ class AssistantState:
                 "Invalid timezone '%s': %s. Falling back to UTC.",
                 tzname, e
             )
+        except ZoneInfoNotFoundError:
+            logger.warning(f"Unknown timezone '{tzname}', falling back to UTC")
             tz = timezone.utc
         return datetime.now(tz)
 
