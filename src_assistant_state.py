@@ -3,12 +3,21 @@
 # - Provides timezone-aware now() and simple mode logic
 
 import json
+import logging
 from pathlib import Path
 from datetime import datetime, timezone
 try:
-    from zoneinfo import ZoneInfo
+    from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 except ImportError:
-    from pytz import timezone as ZoneInfo  # fallback if needed
+    try:
+        from pytz import timezone as ZoneInfo
+        from pytz.exceptions import UnknownTimeZoneError as ZoneInfoNotFoundError
+    except ImportError:
+        # If pytz doesn't have UnknownTimeZoneError, use a generic exception
+        from pytz import timezone as ZoneInfo
+        ZoneInfoNotFoundError = KeyError  # fallback for older pytz versions
+
+logger = logging.getLogger(__name__)
 
 DATA_DIR = Path.cwd() / "data"
 MEMORY_FILE = DATA_DIR / "memory.json"
@@ -49,7 +58,11 @@ class AssistantState:
         tzname = self.state["user_profile"].get("timezone", "America/Los_Angeles")
         try:
             tz = ZoneInfo(tzname)
-        except Exception:
+        except (ZoneInfoNotFoundError, KeyError) as e:
+            logger.warning(
+                "Invalid timezone '%s': %s. Falling back to UTC.",
+                tzname, e
+            )
             tz = timezone.utc
         return datetime.now(tz)
 
