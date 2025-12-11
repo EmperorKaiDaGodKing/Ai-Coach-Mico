@@ -10,7 +10,6 @@ try:
     from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 except ImportError:
     # Fallback to pytz for Python < 3.9
-    from pytz import timezone as ZoneInfo
     try:
         from pytz.exceptions import UnknownTimeZoneError as ZoneInfoNotFoundError
     except (ImportError, AttributeError):
