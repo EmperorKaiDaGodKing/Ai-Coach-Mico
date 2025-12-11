@@ -8,15 +8,15 @@ from datetime import datetime, timezone
 try:
     from zoneinfo import ZoneInfo
 except ImportError:
+    # For Python < 3.9, ensure 'pytz' is installed (add 'pytz; python_version < "3.9"' to requirements.txt)
     from pytz import timezone as ZoneInfo  # fallback if needed
 
-ROOT = Path.cwd()
-DATA_DIR = ROOT / "data"
+DATA_DIR = Path.cwd() / "data"
 MEMORY_FILE = DATA_DIR / "memory.json"
 
 DEFAULT_STATE = {
     "user_profile": {
-        "username": "EmperorKaiDaGodKing",
+        "username": "User",
         "timezone": "America/Los_Angeles",
         "preferences": { "default_mode": "concise", "daily_window": "08:00-22:00" }
     },
@@ -27,7 +27,7 @@ DEFAULT_STATE = {
 class AssistantState:
     def __init__(self, memory_path=MEMORY_FILE):
         self.memory_path = Path(memory_path)
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        self.memory_path.parent.mkdir(parents=True, exist_ok=True)
         if not self.memory_path.exists():
             self._write(DEFAULT_STATE)
         self.state = self._read()
