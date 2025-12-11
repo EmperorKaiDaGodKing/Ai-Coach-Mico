@@ -17,7 +17,6 @@ except ImportError:
         ZoneInfoNotFoundError = KeyError
     # For Python < 3.9, ensure 'pytz' is installed (add 'pytz; python_version < "3.9"' to requirements.txt)
     from pytz import timezone as ZoneInfo  # fallback if needed
-    from pytz.exceptions import UnknownTimeZoneError as ZoneInfoNotFoundError
 
 logger = logging.getLogger(__name__)
 
