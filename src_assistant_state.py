@@ -9,6 +9,13 @@ from datetime import datetime, timezone
 try:
     from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 except ImportError:
+    # Fallback to pytz for Python < 3.9
+    from pytz import timezone as ZoneInfo
+    try:
+        from pytz.exceptions import UnknownTimeZoneError as ZoneInfoNotFoundError
+    except (ImportError, AttributeError):
+        # Older pytz versions may not have UnknownTimeZoneError
+        ZoneInfoNotFoundError = KeyError
     # For Python < 3.9, ensure 'pytz' is installed (add 'pytz; python_version < "3.9"' to requirements.txt)
     from pytz import timezone as ZoneInfo  # fallback if needed
     from pytz.exceptions import UnknownTimeZoneError as ZoneInfoNotFoundError
@@ -54,6 +61,11 @@ class AssistantState:
         tzname = self.state["user_profile"].get("timezone", "America/Los_Angeles")
         try:
             tz = ZoneInfo(tzname)
+        except ZoneInfoNotFoundError as e:
+            logger.warning(
+                "Invalid timezone '%s': %s. Falling back to UTC.",
+                tzname, e
+            )
         except ZoneInfoNotFoundError:
             logger.warning(f"Unknown timezone '{tzname}', falling back to UTC")
             tz = timezone.utc
