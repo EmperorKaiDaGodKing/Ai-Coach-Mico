@@ -64,8 +64,6 @@ class AssistantState:
                 "Invalid timezone '%s': %s. Falling back to UTC.",
                 tzname, e
             )
-        except ZoneInfoNotFoundError:
-            logger.warning(f"Unknown timezone '{tzname}', falling back to UTC")
             tz = timezone.utc
         return datetime.now(tz)
 
