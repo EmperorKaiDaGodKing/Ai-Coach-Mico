@@ -10,7 +10,6 @@ try:
     from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 except ImportError:
     # Fallback to pytz for Python < 3.9
-    from pytz import timezone as ZoneInfo
     try:
         from pytz.exceptions import UnknownTimeZoneError as ZoneInfoNotFoundError
     except (ImportError, AttributeError):
@@ -18,7 +17,6 @@ except ImportError:
         ZoneInfoNotFoundError = KeyError
     # For Python < 3.9, ensure 'pytz' is installed (add 'pytz; python_version < "3.9"' to requirements.txt)
     from pytz import timezone as ZoneInfo  # fallback if needed
-    from pytz.exceptions import UnknownTimeZoneError as ZoneInfoNotFoundError
 
 logger = logging.getLogger(__name__)
 
@@ -66,8 +64,6 @@ class AssistantState:
                 "Invalid timezone '%s': %s. Falling back to UTC.",
                 tzname, e
             )
-        except ZoneInfoNotFoundError:
-            logger.warning(f"Unknown timezone '{tzname}', falling back to UTC")
             tz = timezone.utc
         return datetime.now(tz)
 
