@@ -1,0 +1,39 @@
+Parameters:
+- count: number of single-ticket picks to return (default 5)
+- strategy: 'random', 'heuristic', or 'mixed' (default 'mixed')
+- diversify: if True, try to minimize overlap across returned tickets
+- seed: optional integer for deterministic outcomes
+
+Returns:
+- list of sorted 5-number tuples
+"""
+if seed is not None:
+    random.seed(seed)
+picks: List[Tuple[int, ...]] = []
+used_numbers: Set[int] = set()
+
+for i in range(count):
+    if strategy == 'random':
+        pick = _random_ticket()
+    elif strategy == 'heuristic':
+        pick = _heuristic_ticket(avoid=used_numbers if diversify else None)
+        if pick is None:
+            pick = _random_ticket()
+    else:  # mixed
+        # choose heuristic mostly, occasionally pure random for variety
+        if random.random() < 0.75:
+            pick = _heuristic_ticket(avoid=used_numbers if diversify else None)
+            if pick is None:
+                pick = _random_ticket()
+        else:
+            # random but try to avoid heavy overlap
+            pick = _random_ticket(avoid=used_numbers if diversify else None)
+
+    picks.append(pick)
+    # update used_numbers to encourage diversification; allow some overlap but not total reuse
+    if diversify:
+        # add 3 numbers from the pick to used_numbers (soft blocking)
+        # pick three numbers randomly from the ticket and add to used set
+        used_numbers.update(random.sample(list(pick), 3))
+
+return picks
