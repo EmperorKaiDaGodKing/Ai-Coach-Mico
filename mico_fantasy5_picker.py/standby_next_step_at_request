@@ -1,0 +1,5 @@
+
+Next step (one-line):
+- Save this file as mico_fantasy5_picker.py in your repository (e.g., Ai-Coach-Mico/mico_fantasy5_picker.py), import give_fantasy5_of_the_day into Miko's command handler, and call: give_fantasy5_of_the_day(count=5, budget_level=yourBudget, strategy='mixed').
+
+I will standby.

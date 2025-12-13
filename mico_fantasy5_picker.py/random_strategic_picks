@@ -1,0 +1,41 @@
+for _ in range(max_attempts):
+    # Strategy: pick one from each of two thirds and two from the remaining third (randomize which)
+    thirds_idx = [0, 1, 2]
+    random.shuffle(thirds_idx)
+    picks = []
+    # pick 1 from first two thirds
+    for idx in thirds_idx[:2]:
+        a, b = THIRDS[idx]
+        candidates = [n for n in range(a, b+1) if n in pool]
+        if not candidates:
+            break
+        picks.append(random.choice(candidates))
+    if len(picks) < 2:
+        continue
+    # pick 3 from remaining pool trying to balance parity and sum
+    remaining_pool = [n for n in pool if n not in picks]
+    if len(remaining_pool) < 3:
+        continue
+    picks.extend(random.sample(remaining_pool, 3))
+    picks = sorted(set(picks))
+    if len(picks) != 5:
+        continue
+    # parity check: prefer 2-3 evens
+    evens = sum(1 for n in picks if n % 2 == 0)
+    if evens < 1 or evens > 4:
+        # allow some flexibility, but retry often
+        if random.random() < 0.6:
+            continue
+    # consecutive check
+    if _is_too_consecutive(picks):
+        continue
+    s = sum(picks)
+    if abs(s - prefer_sum_center) > sum_tolerance:
+        # occasionally accept out-of-range to allow variety
+        if random.random() < 0.3:
+            pass
+        else:
+            continue
+    return tuple(picks)
+# fallback to random if heuristic fails
+return _random_ticket(avoid)

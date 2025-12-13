@@ -1,0 +1,6 @@
+out = get_picks(count=max(1, min(5, args.count)), strategy=args.strategy, seed=args.seed)
+if args.format_playslip:
+    print(format_picks_for_playslip(out))
+else:
+    for i, p in enumerate(out, 1):
+        print(f"Ticket {i}: {', '.join(map(str, p))}")
