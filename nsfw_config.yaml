@@ -1,0 +1,10 @@
+# Private Adult Mode configuration
+private_adult_mode:
+  enabled: false          # Owner toggles this to allow activation
+  owner_usernames:
+    - EmperorKaiDaGodKing # Only these users can enable/disable the feature
+  require_two_step_opt_in: true
+  moderation_endpoint: "https://moderation.example/api/check"
+  audit_log_path: "logs/private_mode_audit.log"
+  retention_days: 30
+  immediate_disable_command: "END_PRIVATE_MODE"
