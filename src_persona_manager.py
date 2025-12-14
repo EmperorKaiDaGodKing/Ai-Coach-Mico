@@ -61,7 +61,11 @@ class PersonaManager:
             return False, "This persona requires explicit consent to engage in restricted modes."
 
         for k in self.persona.get("disallowed_content", []):
-            if k in (text or "").lower():
+            # Convert underscores to word boundaries for compound terms
+            import re
+            # Replace underscores with a pattern that matches underscores or spaces
+            pattern = r'\b' + re.escape(k).replace(r'\_', r'[\s_]+') + r'\b'
+            if re.search(pattern, (text or "").lower()):
                 return False, f"Disallowed by persona rule: {k}"
 
         return True, "Allowed"

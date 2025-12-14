@@ -71,9 +71,7 @@ def check_safe(text: str):
 
     # Optional external moderation
     cfg = _load_config()
-    endpoint = (
-        cfg.get("private_adult_mode", {}) or {}
-    ).get("moderation_endpoint")
+    endpoint = cfg.get("private_adult_mode", {}).get("moderation_endpoint")
     if endpoint:
         allowed, reason = _call_moderation(endpoint, text)
         if not allowed:
