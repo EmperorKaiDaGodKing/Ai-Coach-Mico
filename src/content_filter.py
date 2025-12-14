@@ -43,11 +43,8 @@ def check_safe(text: str) -> Tuple[bool, str]:
     if not text:
         return True, ""
     
-    # Normalize to lowercase for checking
-    text_lower = text.lower()
-    
-    # Check against blacklist
-    match = BLACKLIST_REGEX.search(text_lower)
+    # Check against blacklist (regex already uses re.IGNORECASE)
+    match = BLACKLIST_REGEX.search(text)
     if match:
         matched_word = match.group(0)
         return False, f"blacklist: {matched_word}"
