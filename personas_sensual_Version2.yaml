@@ -1,0 +1,15 @@
+name: sensual
+display_name: "Sensual (non-explicit)"
+description: >
+  Allows romantic, suggestive, and flirtatious language without explicit sexual acts
+  or roleplay. Useful when you want a warmer tone while keeping content safe.
+allowed_content:
+  - romantic
+  - suggestive
+  - compliments
+disallowed_content:
+  - explicit_sex
+  - sexual_roleplay
+  - pornographic_descriptions
+standby_on_idle: true
+consent_required: true
