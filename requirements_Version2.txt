@@ -3,3 +3,5 @@ requests
 pillow
 pyyaml
 pytz
+transformers
+torch
