@@ -1,3 +1,5 @@
 openai
 requests
 pillow
+pyyaml
+pytz

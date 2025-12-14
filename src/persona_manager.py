@@ -7,7 +7,7 @@ import yaml
 from pathlib import Path
 from .content_filter import check_safe  # implement classifier + regex list
 
-PERSONA_DIR = Path("personas")
+PERSONA_DIR = Path(__file__).parent.parent / "personas"
 
 class PersonaManager:
     def __init__(self, persona_name="sensual"):
