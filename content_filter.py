@@ -12,7 +12,7 @@ from pathlib import Path
 
 try:
     import yaml
-except Exception:
+except ImportError:
     yaml = None
 
 # Compact blacklist of explicit/sexual terms (kept conservative and obvious).
@@ -36,7 +36,7 @@ def _call_moderation(endpoint: str, text: str):
     # Optional external moderation call; returns (allowed:bool, reason:str)
     try:
         import requests
-    except Exception:
+    except ImportError:
         return True, "requests unavailable; skipping moderation"
 
     try:

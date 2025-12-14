@@ -12,10 +12,10 @@ from pathlib import Path
 # tolerant import to work when module is imported as package or run top-level
 try:
     from content_filter import check_safe
-except Exception:
+except (ImportError, ModuleNotFoundError):
     try:
         from .content_filter import check_safe
-    except Exception:
+    except (ImportError, ModuleNotFoundError):
         # Last resort: define a permissive stub to avoid import failures during static checks.
         def check_safe(text):
             return True, "no_content_filter"
