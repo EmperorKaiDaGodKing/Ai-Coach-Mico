@@ -3,7 +3,7 @@ import unittest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-# The AssistantState module lives at repo root (not under the src/ package).
+# AssistantState comes from the root-level src_assistant_state module (not the src/ package).
 from src_assistant_state import AssistantState
 
 
