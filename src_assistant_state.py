@@ -2,7 +2,6 @@
 # - Stores profile, timezone, short & long memory to data/memory.json
 # - Provides timezone-aware now() and simple mode logic
 
-import copy
 import json
 import logging
 from pathlib import Path
@@ -24,10 +23,8 @@ logger = logging.getLogger(__name__)
 DATA_DIR = Path.cwd() / "data"
 MEMORY_FILE = DATA_DIR / "memory.json"
 
-DEFAULT_MEMORY_BANK = {
-    "engagement": {},
-    "journal": []
-}
+def _new_memory_bank():
+    return {"engagement": {}, "journal": []}
 
 DEFAULT_STATE = {
     "user_profile": {
@@ -37,7 +34,7 @@ DEFAULT_STATE = {
     },
     "short_term": [],
     "long_term": [],
-    "memory_bank": copy.deepcopy(DEFAULT_MEMORY_BANK)
+    "memory_bank": _new_memory_bank()
 }
 
 MAX_JOURNAL_ENTRIES = 200
@@ -62,7 +59,7 @@ class AssistantState:
             json.dump(obj, f, indent=2)
 
     def _ensure_memory_bank(self):
-        bank = self.state.setdefault("memory_bank", copy.deepcopy(DEFAULT_MEMORY_BANK))
+        bank = self.state.setdefault("memory_bank", _new_memory_bank())
         bank.setdefault("engagement", {})
         bank.setdefault("journal", [])
         return bank
@@ -161,7 +158,7 @@ class AssistantState:
             "time": self.get_now().isoformat(),
             "note": note,
             "mood": mood or engagement.get("mood"),
-            "tags": tags or [],
+            "tags": tags if tags is not None else [],
             "share_with_chat": bool(share_with_chat),
         }
         bank["journal"].append(entry)
