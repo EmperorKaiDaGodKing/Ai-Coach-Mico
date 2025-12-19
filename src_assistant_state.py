@@ -2,6 +2,7 @@
 # - Stores profile, timezone, short & long memory to data/memory.json
 # - Provides timezone-aware now() and simple mode logic
 
+import copy
 import json
 import logging
 from pathlib import Path
@@ -23,6 +24,11 @@ logger = logging.getLogger(__name__)
 DATA_DIR = Path.cwd() / "data"
 MEMORY_FILE = DATA_DIR / "memory.json"
 
+DEFAULT_MEMORY_BANK = {
+    "engagement": {},
+    "journal": []
+}
+
 DEFAULT_STATE = {
     "user_profile": {
         "username": "User",
@@ -31,10 +37,7 @@ DEFAULT_STATE = {
     },
     "short_term": [],
     "long_term": [],
-    "memory_bank": {
-        "engagement": {},
-        "journal": []
-    }
+    "memory_bank": copy.deepcopy(DEFAULT_MEMORY_BANK)
 }
 
 MAX_JOURNAL_ENTRIES = 200
@@ -59,7 +62,7 @@ class AssistantState:
             json.dump(obj, f, indent=2)
 
     def _ensure_memory_bank(self):
-        bank = self.state.setdefault("memory_bank", {})
+        bank = self.state.setdefault("memory_bank", copy.deepcopy(DEFAULT_MEMORY_BANK))
         bank.setdefault("engagement", {})
         bank.setdefault("journal", [])
         return bank
@@ -143,14 +146,14 @@ class AssistantState:
         bank = self._ensure_memory_bank()
         return bank["engagement"]
 
-    def log_moment(self, note, mood=None, tags=None, share=False):
+    def log_moment(self, note, mood=None, tags=None, share_with_chat=False):
         """
         Log a journal entry tied to the current or provided mood.
-        `share=True` marks it as safe to surface inside chat context.
+        `share_with_chat=True` marks it as safe to surface inside chat context.
         - note: free-form text for the entry
         - mood: optional override for this entry
         - tags: optional list of short labels to group or search later
-        - share: whether this entry can be used in chat context
+        - share_with_chat: whether this entry can be used in chat context
         """
         bank = self._ensure_memory_bank()
         engagement = bank["engagement"]
@@ -159,10 +162,11 @@ class AssistantState:
             "note": note,
             "mood": mood or engagement.get("mood"),
             "tags": tags or [],
-            "share_with_chat": bool(share),
+            "share_with_chat": bool(share_with_chat),
         }
         bank["journal"].append(entry)
-        bank["journal"] = bank["journal"][-MAX_JOURNAL_ENTRIES:]
+        if len(bank["journal"]) > MAX_JOURNAL_ENTRIES:
+            bank["journal"] = bank["journal"][-MAX_JOURNAL_ENTRIES:]
         self.save()
         return entry
 

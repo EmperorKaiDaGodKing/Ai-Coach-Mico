@@ -28,7 +28,7 @@ class AssistantStateMemoryBankTests(unittest.TestCase):
             self.assertEqual(profile["mood"], "calm")
             self.assertIn("instructions", profile)
 
-            entry = state.log_moment("Morning check-in", tags=["journal"], share=True)
+            entry = state.log_moment("Morning check-in", tags=["journal"], share_with_chat=True)
             self.assertEqual(entry["note"], "Morning check-in")
             self.assertTrue(entry["share_with_chat"])
 
@@ -40,8 +40,8 @@ class AssistantStateMemoryBankTests(unittest.TestCase):
             memory_path = Path(tmp) / "memory.json"
             state = AssistantState(memory_path=memory_path)
 
-            state.log_moment("Private note", share=False)
-            state.log_moment("Share this note", share=True)
+            state.log_moment("Private note", share_with_chat=False)
+            state.log_moment("Share this note", share_with_chat=True)
 
             shared_notes = [e["note"] for e in state.recall_journal(shared_only=True)]
             self.assertEqual(shared_notes, ["Share this note"])
