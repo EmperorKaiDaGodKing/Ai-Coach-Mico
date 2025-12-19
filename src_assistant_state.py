@@ -30,7 +30,11 @@ DEFAULT_STATE = {
         "preferences": { "default_mode": "concise", "daily_window": "08:00-22:00" }
     },
     "short_term": [],
-    "long_term": []
+    "long_term": [],
+    "memory_bank": {
+        "engagement": {},
+        "journal": []
+    }
 }
 
 class AssistantState:
@@ -40,6 +44,7 @@ class AssistantState:
         if not self.memory_path.exists():
             self._write(DEFAULT_STATE)
         self.state = self._read()
+        self._ensure_memory_bank()
         self.mode = self.state["user_profile"]["preferences"].get("default_mode", "concise")
         self.standby = True  # when True, assistant waits after responding
 
@@ -50,6 +55,12 @@ class AssistantState:
     def _write(self, obj):
         with open(self.memory_path, "w", encoding="utf-8") as f:
             json.dump(obj, f, indent=2)
+
+    def _ensure_memory_bank(self):
+        bank = self.state.setdefault("memory_bank", {})
+        bank.setdefault("engagement", {})
+        bank.setdefault("journal", [])
+        return bank
 
     def save(self):
         self.state["user_profile"]["preferences"]["default_mode"] = self.mode
@@ -99,6 +110,58 @@ class AssistantState:
         if explicit_request or self.mode == "instructional":
             return True
         return False
+
+    # --- Memory bank helpers -------------------------------------------------
+    def update_engagement_profile(self, mood=None, style=None, flow=None, instructions=None):
+        """
+        Store user-guided engagement settings (mood, tone/style, flow cues, and guardrails).
+        instructions can be a string or list; stored as list for consistency.
+        """
+        bank = self._ensure_memory_bank()
+        engagement = bank["engagement"]
+        if mood is not None:
+            engagement["mood"] = mood
+        if style is not None:
+            engagement["style"] = style
+        if flow is not None:
+            engagement["flow"] = flow
+        if instructions is not None:
+            if isinstance(instructions, str):
+                engagement["instructions"] = [instructions]
+            else:
+                engagement["instructions"] = list(instructions)
+        engagement["last_updated"] = self.get_now().isoformat()
+        self.save()
+        return engagement
+
+    def get_engagement_profile(self):
+        bank = self._ensure_memory_bank()
+        return bank["engagement"]
+
+    def log_moment(self, note, mood=None, tags=None, share=False):
+        """
+        Log a journal entry tied to the current or provided mood.
+        `share=True` marks it as safe to surface inside chat context.
+        """
+        bank = self._ensure_memory_bank()
+        entry = {
+            "time": self.get_now().isoformat(),
+            "note": note,
+            "mood": mood or bank.get("engagement", {}).get("mood"),
+            "tags": tags or [],
+            "share_with_chat": bool(share),
+        }
+        bank["journal"].append(entry)
+        bank["journal"] = bank["journal"][-200:]
+        self.save()
+        return entry
+
+    def recall_journal(self, limit=20, shared_only=False):
+        bank = self._ensure_memory_bank()
+        entries = bank["journal"]
+        if shared_only:
+            entries = [e for e in entries if e.get("share_with_chat")]
+        return entries[-limit:]
 
 # Example usage:
 # state = AssistantState()
