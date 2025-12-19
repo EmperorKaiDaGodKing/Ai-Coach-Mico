@@ -37,6 +37,8 @@ DEFAULT_STATE = {
     }
 }
 
+MAX_JOURNAL_ENTRIES = 200
+
 class AssistantState:
     def __init__(self, memory_path=MEMORY_FILE):
         self.memory_path = Path(memory_path)
@@ -151,15 +153,16 @@ class AssistantState:
         - share: whether this entry can be used in chat context
         """
         bank = self._ensure_memory_bank()
+        engagement = bank["engagement"]
         entry = {
             "time": self.get_now().isoformat(),
             "note": note,
-            "mood": mood or bank.get("engagement", {}).get("mood"),
+            "mood": mood or engagement.get("mood"),
             "tags": tags or [],
             "share_with_chat": bool(share),
         }
         bank["journal"].append(entry)
-        bank["journal"] = bank["journal"][-200:]
+        bank["journal"] = bank["journal"][-MAX_JOURNAL_ENTRIES:]
         self.save()
         return entry
 
