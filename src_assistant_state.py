@@ -114,8 +114,11 @@ class AssistantState:
     # --- Memory bank helpers -------------------------------------------------
     def update_engagement_profile(self, mood=None, style=None, flow=None, instructions=None):
         """
-        Store user-guided engagement settings (mood, tone/style, flow cues, and guardrails).
-        instructions can be a string or list; stored as list for consistency.
+        Store user-guided engagement settings that steer responses.
+        - mood: how you want the assistant to match your energy (str)
+        - style: tone or delivery preference, e.g., "supportive" (str)
+        - flow: pacing/structure hints, e.g., "check in, then suggest next step" (str)
+        - instructions: guardrails or cues; str or list of strings, stored as list
         """
         bank = self._ensure_memory_bank()
         engagement = bank["engagement"]
@@ -142,6 +145,10 @@ class AssistantState:
         """
         Log a journal entry tied to the current or provided mood.
         `share=True` marks it as safe to surface inside chat context.
+        - note: free-form text for the entry
+        - mood: optional override for this entry
+        - tags: optional list of short labels to group or search later
+        - share: whether this entry can be used in chat context
         """
         bank = self._ensure_memory_bank()
         entry = {
@@ -157,6 +164,8 @@ class AssistantState:
         return entry
 
     def recall_journal(self, limit=20, shared_only=False):
+        """Return the most recent journal entries (dicts with time/note/mood/tags/share flag).
+        Set shared_only=True to return only entries marked shareable."""
         bank = self._ensure_memory_bank()
         entries = bank["journal"]
         if shared_only:
