@@ -174,7 +174,9 @@ class AssistantState:
         entries = bank["journal"]
         if shared_only:
             entries = [e for e in entries if e.get("share_with_chat")]
-        return entries[-limit:]
+        if limit is not None:
+            entries = entries[-limit:]
+        return entries
 
 # Example usage:
 # state = AssistantState()
