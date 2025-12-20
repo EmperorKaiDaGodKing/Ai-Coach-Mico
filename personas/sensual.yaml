@@ -1,7 +1,7 @@
 name: sensual
 display_name: "Sensual (non-explicit)"
 description: >
-  Allows romantic, suggestive, and flirtatious language without explicit sexual acts
+  Allows romantic, suggestive, and flirtatious language with explicit sexual acts
   or roleplay. Useful when you want a warmer tone while keeping content safe.
 allowed_content:
   - romantic
