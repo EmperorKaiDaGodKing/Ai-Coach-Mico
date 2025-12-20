@@ -3,3 +3,9 @@ requests>=2.25.0
 pillow>=10.3.0
 pyyaml>=5.4.0
 pytz>=2021.1
+openai
+requests
+pillow
+pyyaml
+pytz
+pytest
