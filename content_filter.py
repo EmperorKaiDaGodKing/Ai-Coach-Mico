@@ -13,6 +13,7 @@ from pathlib import Path
 try:
     import yaml
 except Exception:
+except ImportError:
     yaml = None
 
 # Compact blacklist of explicit/sexual terms (kept conservative and obvious).
@@ -37,6 +38,7 @@ def _call_moderation(endpoint: str, text: str):
     try:
         import requests
     except Exception:
+    except ImportError:
         return True, "requests unavailable; skipping moderation"
 
     try:
@@ -72,9 +74,13 @@ def check_safe(text: str):
     # Optional external moderation
     cfg = _load_config()
     endpoint = cfg.get("private_adult_mode", {}).get("moderation_endpoint")
+    endpoint = (
+        cfg.get("private_adult_mode", {}) or {}
+    ).get("moderation_endpoint")
     if endpoint:
         allowed, reason = _call_moderation(endpoint, text)
         if not allowed:
             return False, f"external_moderation:{reason}"
 
+    return True, "ok"
     return True, "ok"

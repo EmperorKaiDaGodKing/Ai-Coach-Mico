@@ -16,6 +16,10 @@ except Exception:
     try:
         from .content_filter import check_safe
     except Exception:
+except (ImportError, ModuleNotFoundError):
+    try:
+        from .content_filter import check_safe
+    except (ImportError, ModuleNotFoundError):
         # Last resort: define a permissive stub to avoid import failures during static checks.
         def check_safe(text):
             return True, "no_content_filter"
@@ -66,6 +70,7 @@ class PersonaManager:
             # Replace underscores with a pattern that matches underscores or spaces
             pattern = r'\b' + re.escape(k).replace(r'\_', r'[\s_]+') + r'\b'
             if re.search(pattern, (text or "").lower()):
+            if k in (text or "").lower():
                 return False, f"Disallowed by persona rule: {k}"
 
         return True, "Allowed"
@@ -79,4 +84,5 @@ class PersonaManager:
             return {"status": "blocked", "message": msg}
 
         # Placeholder: generation delegated elsewhere
+        return {"status": "ok", "message": "Generate safe persona response here."}
         return {"status": "ok", "message": "Generate safe persona response here."}
