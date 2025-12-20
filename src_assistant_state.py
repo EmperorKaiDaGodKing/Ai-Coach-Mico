@@ -46,7 +46,7 @@ class AssistantState:
         if not self.memory_path.exists():
             self._write(DEFAULT_STATE)
         self.state = self._read()
-        self._ensure_memory_bank()
+        self._ensure_structure()
         self.mode = self.state["user_profile"]["preferences"].get("default_mode", "concise")
         self.standby = True  # when True, assistant waits after responding
 
@@ -57,6 +57,46 @@ class AssistantState:
     def _write(self, obj):
         with open(self.memory_path, "w", encoding="utf-8") as f:
             json.dump(obj, f, indent=2)
+
+    def _ensure_list_field(self, name):
+        if name not in self.state or not isinstance(self.state[name], list):
+            self.state[name] = []
+            return True
+        return False
+
+    def _ensure_structure(self):
+        changed = False
+        profile = self.state.setdefault("user_profile", {})
+        if "username" not in profile:
+            profile["username"] = DEFAULT_STATE["user_profile"]["username"]
+            changed = True
+        if "timezone" not in profile:
+            profile["timezone"] = DEFAULT_STATE["user_profile"]["timezone"]
+            changed = True
+
+        prefs = profile.setdefault("preferences", {})
+        if "default_mode" not in prefs:
+            prefs["default_mode"] = DEFAULT_STATE["user_profile"]["preferences"]["default_mode"]
+            changed = True
+        if "daily_window" not in prefs:
+            prefs["daily_window"] = DEFAULT_STATE["user_profile"]["preferences"]["daily_window"]
+            changed = True
+
+        if self._ensure_list_field("short_term"):
+            changed = True
+        if self._ensure_list_field("long_term"):
+            changed = True
+
+        pre_bank = self.state.get("memory_bank")
+        bank_missing = pre_bank is None
+        engagement_missing = bank_missing or "engagement" not in pre_bank
+        journal_missing = bank_missing or "journal" not in pre_bank
+        self._ensure_memory_bank()
+        if bank_missing or engagement_missing or journal_missing:
+            changed = True
+
+        if changed:
+            self._write(self.state)
 
     def _ensure_memory_bank(self):
         bank = self.state.setdefault("memory_bank", _new_memory_bank())
@@ -154,11 +194,17 @@ class AssistantState:
         """
         bank = self._ensure_memory_bank()
         engagement = bank["engagement"]
+        if tags is None:
+            normalized_tags = []
+        elif isinstance(tags, str):
+            normalized_tags = [tags]
+        else:
+            normalized_tags = list(tags)
         entry = {
             "time": self.get_now().isoformat(),
             "note": note,
             "mood": mood or engagement.get("mood"),
-            "tags": tags if tags is not None else [],
+            "tags": normalized_tags,
             "share_with_chat": bool(share_with_chat),
         }
         bank["journal"].append(entry)
