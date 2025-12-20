@@ -12,6 +12,10 @@ from pathlib import Path
 # tolerant import to work when module is imported as package or run top-level
 try:
     from content_filter import check_safe
+except Exception:
+    try:
+        from .content_filter import check_safe
+    except Exception:
 except (ImportError, ModuleNotFoundError):
     try:
         from .content_filter import check_safe
@@ -61,6 +65,11 @@ class PersonaManager:
             return False, "This persona requires explicit consent to engage in restricted modes."
 
         for k in self.persona.get("disallowed_content", []):
+            # Convert underscores to word boundaries for compound terms
+            import re
+            # Replace underscores with a pattern that matches underscores or spaces
+            pattern = r'\b' + re.escape(k).replace(r'\_', r'[\s_]+') + r'\b'
+            if re.search(pattern, (text or "").lower()):
             if k in (text or "").lower():
                 return False, f"Disallowed by persona rule: {k}"
 
@@ -75,4 +84,5 @@ class PersonaManager:
             return {"status": "blocked", "message": msg}
 
         # Placeholder: generation delegated elsewhere
+        return {"status": "ok", "message": "Generate safe persona response here."}
         return {"status": "ok", "message": "Generate safe persona response here."}

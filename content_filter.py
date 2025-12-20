@@ -12,6 +12,7 @@ from pathlib import Path
 
 try:
     import yaml
+except Exception:
 except ImportError:
     yaml = None
 
@@ -36,6 +37,7 @@ def _call_moderation(endpoint: str, text: str):
     # Optional external moderation call; returns (allowed:bool, reason:str)
     try:
         import requests
+    except Exception:
     except ImportError:
         return True, "requests unavailable; skipping moderation"
 
@@ -71,6 +73,7 @@ def check_safe(text: str):
 
     # Optional external moderation
     cfg = _load_config()
+    endpoint = cfg.get("private_adult_mode", {}).get("moderation_endpoint")
     endpoint = (
         cfg.get("private_adult_mode", {}) or {}
     ).get("moderation_endpoint")
@@ -79,4 +82,5 @@ def check_safe(text: str):
         if not allowed:
             return False, f"external_moderation:{reason}"
 
+    return True, "ok"
     return True, "ok"
