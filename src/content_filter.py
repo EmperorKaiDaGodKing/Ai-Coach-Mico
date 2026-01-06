@@ -6,23 +6,7 @@ import re
 from typing import Tuple
 
 # Compact blacklist of explicit sexual keywords/phrases (regex patterns)
-BLACKLIST_PATTERNS = [
-    r'\bsex\b',
-    r'\bfuck',
-    r'\bporn',
-    r'\bnaked\b',
-    r'\bnude\b',
-    r'\bpenis\b',
-    r'\bvagina\b',
-    r'\bcock\b',
-    r'\bpussy\b',
-    r'\bcum\b',
-    r'\borgasm',
-    r'\bmasturbat',
-    r'\berotic\s+roleplay',
-    r'\bsexual\s+act',
-    r'\bintercourse\b',
-]
+BLACKLIST_PATTERNS = 
 
 # Compile patterns for efficiency
 BLACKLIST_REGEX = re.compile('|'.join(BLACKLIST_PATTERNS), re.IGNORECASE)
