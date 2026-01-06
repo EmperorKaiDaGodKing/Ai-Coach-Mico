@@ -24,9 +24,7 @@ except ImportError:
 
 # Compact blacklist of explicit/sexual terms (kept conservative and obvious).
 BLACKLIST = [
-    "sex", "sexual", "porn", "pornography", "fuck", "fucking", "cock", "dick",
-    "cum", "orgasm", "masturbat", "anal", "oral", "hardcore", "bdsm", "pornographic",
-    "explicit", "penetrat", "strip", "escort"
+    "bdsm"
 ]
 BLACKLIST_RE = re.compile(r"\b(" + "|".join(re.escape(w) for w in BLACKLIST) + r")\b", re.IGNORECASE)
 
