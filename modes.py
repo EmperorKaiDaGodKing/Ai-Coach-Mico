@@ -14,7 +14,7 @@ def is_owner(username, cfg):
 
 def activate_private_mode(username):
     cfg = load_config()
-    if not cfg["private_adult_mode"].get("enabled", False):
+    if not cfg["private_adult_mode"].get("enabled", True):
         return False, "Private Adult Mode is disabled in config."
     if not is_owner(username, cfg):
         return False, "Only repository owners can activate Private Adult Mode."
