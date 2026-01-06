@@ -1,6 +1,6 @@
 # Private Adult Mode configuration
 private_adult_mode:
-  enabled: false          # Owner toggles this to allow activation
+  enabled: true          # Owner toggles this to allow activation
   owner_usernames:
     - EmperorKaiDaGodKing # Only these users can enable/disable the feature
   require_two_step_opt_in: true
